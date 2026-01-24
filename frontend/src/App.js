@@ -7,7 +7,7 @@ function App() {
   const globeEl = useRef();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/air-quality')
+    fetch('/api/air-quality')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
