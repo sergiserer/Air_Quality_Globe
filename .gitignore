@@ -1,1 +1,14 @@
 .env
+# Ignorar las dependencias (¡Esto borrará los 9999 cambios!)
+node_modules/
+**/node_modules/
+
+# Ignorar archivos de sistema y entorno (SEGURIDAD)
+.DS_Store
+
+
+# Ignorar carpetas de compilación del frontend (la original)
+frontend/build/
+frontend/dist/
+
+# OJO: NO ignoramos backend/public porque esa es la que queremos subir a Render
