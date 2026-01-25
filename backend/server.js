@@ -8,49 +8,70 @@ const app = express();
 app.use(cors()); 
 const OPENAQ_API_KEY = process.env.OPENAQ_API_KEY;
 
-// --- API ROUTES ---
 app.get('/api/air-quality', async (req, res) => {
   try {
-    console.log(" Connecting to OpenAQ (Endpoint LATEST)...");
+    const PAGES_TO_FETCH = 3; 
+    
+    console.log(` starting--- ~${PAGES_TO_FETCH * 1000} nodes...`);
 
-    const response = await axios.get('https://api.openaq.org/v3/parameters/2/latest', {
-      params: { 
-        limit: 1000,      
-      },
-      headers: { 'X-API-Key': OPENAQ_API_KEY }
-    });
+    const requests = [];
 
-    console.log(`received ${response.data.results.length} data.`);
+    for (let page = 1; page <= PAGES_TO_FETCH; page++) {
+      const url = `https://api.openaq.org/v3/parameters/2/latest`;
+      
+      const params = {
+        limit: 1000,
+        page: page
+      };
 
-    const cleanData = response.data.results
-      .filter(d => d.coordinates && d.value >= 0) 
+      console.log(`asking ${page} to OpenAQ...`);
+
+      requests.push(
+        axios.get(url, { 
+          params: params,
+          headers: { 'X-API-Key': OPENAQ_API_KEY } 
+        })
+        .catch(err => {
+          // Si una página falla, solo avisamos y seguimos con las otras
+          console.warn(` Warning: frontend error ${page}: ${err.message}`);
+          return { data: { results: [] } }; 
+        })
+      );
+    }
+
+    // Esperamos las 3 respuestas a la vez
+    const responses = await Promise.all(requests);
+
+    // Juntamos todo en una sola lista gigante
+    const allRawData = responses.flatMap(r => r.data.results || []);
+
+    console.log(` total data: ${allRawData.length}`);
+
+    // Procesamos y limpiamos para el frontend
+    const cleanData = allRawData
       .map(d => {
         return {
-          lat: d.coordinates.latitude,
-          lng: d.coordinates.longitude,
-          city: `Location ${d.locationsId || 'Unknown'}`, 
-          value: d.value,
-          color: d.value > 35 ? '#ff0000' : d.value > 12 ? '#f1c40f' : '#2ecc71'
+          lat: d.coordinates?.latitude,
+          lng: d.coordinates?.longitude,
+          city: `Loc ${d.locationsId}`, 
+          // Este endpoint V3 nos da el valor directo aquí
+          value: d.value 
         };
-      });
+      })
+     
+      .filter(d => d.lat && d.lng && d.value >= 0);
 
-    console.log(` OK! sending ${cleanData.length} data.`);
+    console.log(`sending ${cleanData.length} to front.`);
     res.json(cleanData);
 
   } catch (error) {
-    const msg = error.response?.data || error.message;
-    console.error(" Error API:", JSON.stringify(msg, null, 2));
-    res.status(500).json({ error: 'Failed to fetch latest data' });
+    console.error(" ERROR:", error.message);
+    res.status(500).json({ error: 'Failed to fetch V3 data' });
   }
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend + Frontend ready on port ${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => console.log(` Server ready on port ${PORT}`));
