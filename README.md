@@ -2,7 +2,7 @@
 
 An interactive web application that visualizes real-time air quality data (PM2.5) on a 3D globe. The project uses data from the OpenAQ API and renders glowing points with dynamic colors based on pollution levels.
 
-![Project Preview](assets/demo-1.0.png)
+![Project Preview](assets/demo2-0.png)
 
 
 ## Live Demo
