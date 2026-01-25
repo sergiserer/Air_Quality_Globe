@@ -4,7 +4,7 @@ import * as THREE from 'three';
 
 const REGIONS = {
   WORLD: { 
-    label: 'Wide World', 
+    label: 'Global', 
     view: { lat: 15, lng: 0, altitude: 2.0 } 
   },
   EUROPE: { 
