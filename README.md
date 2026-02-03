@@ -1,6 +1,6 @@
-#  Global Air Quality 3D Visualizer
+# Air Quality Globe – 3D Visualization Experiment
 
-An interactive web application that visualizes real-time air quality data (PM2.5) on a 3D globe. The project uses data from the OpenAQ API and renders glowing points with dynamic colors based on pollution levels.
+A small side project to explore 3D data visualization in the browser using real-time air quality data (PM2.5).
 
 ![Project Preview](assets/demo_video.gif)
 
@@ -8,15 +8,13 @@ An interactive web application that visualizes real-time air quality data (PM2.5
 ## Live Demo
 You can see the project running here:  
 [** View Live Deployment on Render**](https://air-quality-globe.onrender.com/)  
-## Render Free Plan Notice
 
-This project is deployed using **Render’s free plan**.
 
-If there are **no incoming requests for 15 minutes**, Render automatically puts the server to sleep.  
-As a result, **the first request after inactivity may take longer to load** while the server wakes up.
+## Purpose
 
-This behavior is **normal and expected**, and is a limitation of the free hosting plan—not a performance issue with the application itself.
-
+This project was built as a learning exercise to:
+- Experiment with 3D visualization using Three.js
+- Practice integrating a React frontend with a Node/Express backend
 
 
 ## Features
@@ -28,24 +26,30 @@ This behavior is **normal and expected**, and is a limitation of the free hostin
   - **🟡 Yellow:** Moderate (12–35 PM2.5)
   - **🟠 Orange:** Unhealthy for sensitive groups (35–55 PM2.5)
   - **🔴 Red:** Unhealthy (>55 PM2.5)
-- **Visual Effects:** Glowing particles created using custom Canvas textures.
-- **Unified Architecture:** The backend (Node/Express) serves both the API and the frontend static files (React).
 
 ## Technologies Used
 
 ### Frontend
-- React.js
-- Three.js
-- react-globe.gl
-- CSS (Responsive design)
+React.js, Three.js, react-globe.gl, CSS
 
 ### Backend
-- Node.js
-- Express.js
-- Axios (HTTP requests)
-- Dotenv (Environment variable management)
+Node.js, Express.js, Axios
+
 
 ### External API
 - [OpenAQ API](https://openaq.org/) (Open air quality data)
+
+## Limitations
+It is not intended to be a scientifically accurate air quality analysis tool.
+- Data is visualized at a basic, per-measurement level
+- No spatial interpolation or historical trend analysis
+- No advanced performance optimizations
+- No automated testing
+
+The focus is on visualization and integration, not on analytical depth.
+
+## Render Free Plan Notice
+Deployed on Render (free plan, may take longer to load after inactivity).
+
 
 ---
