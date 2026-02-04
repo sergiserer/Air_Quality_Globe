@@ -2,7 +2,7 @@
 
 A small side project to explore 3D data visualization in the browser using real-time air quality data (PM2.5).
 
-![Project Preview](assets/demo_video.gif)
+![Project Preview](assets/output.gif)
 
 
 ## Live Demo
