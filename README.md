@@ -48,7 +48,6 @@ Node.js, Express.js, Axios
 It is not intended to be a scientifically accurate air quality analysis tool.
 - Data is visualized at a basic, per-measurement level
 - No spatial interpolation or historical trend analysis
-- No advanced performance optimizations
 - No automated testing
 
 The focus is on visualization and integration, not on analytical depth.
