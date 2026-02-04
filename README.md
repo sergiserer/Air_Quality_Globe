@@ -1,8 +1,12 @@
 # Air Quality Globe – 3D Visualization Experiment
+[<img src="https://img.shields.io/badge/Language-JavaScript-F7DF1E?logo=javascript&logoColor=black">](https://www.javascript.com/)
+[<img src="https://img.shields.io/badge/3D-Three.js-000000?logo=three.js&logoColor=white">](https://threejs.org/)
 
 A small side project to explore 3D data visualization in the browser using real-time air quality data (PM2.5).
 
 ![Project Preview](assets/output.gif)
+
+
 
 
 ## Live Demo
