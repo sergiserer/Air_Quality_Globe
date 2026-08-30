@@ -10,7 +10,7 @@ const OPENAQ_API_KEY = process.env.OPENAQ_API_KEY;
 
 app.get('/api/air-quality', async (req, res) => {
   try {
-    const PAGES_TO_FETCH = 3; 
+    const PAGES_TO_FETCH = 30;
     
     console.log(` starting...`);
 

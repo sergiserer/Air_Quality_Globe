@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import * as THREE from 'three';
+import { createPointsObject, disposePointsObject } from './pointsLayer';
+
+const POINTS_ALTITUDE = 0.008;
 
 const REGIONS = {
   WORLD: { 
@@ -21,6 +24,7 @@ function App() {
   const [points, setPoints] = useState([]);
   const [activeRegion, setActiveRegion] = useState('WORLD');
   const globeEl = useRef();
+  const pointsObjRef = useRef();
 
   useEffect(() => {
     fetch('/api/air-quality')
@@ -41,7 +45,7 @@ function App() {
 
   const glowTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 128; // Reducido de 256 a 128 para mejor rendimiento con 3000 nodos
+    canvas.width = 128;
     canvas.height = 128;
     const context = canvas.getContext('2d');
     const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
@@ -53,16 +57,40 @@ function App() {
     return new THREE.CanvasTexture(canvas);
   }, []);
 
-  const getPointColor = (value) => {
-    if (value <= 12) return new THREE.Color(0x00ff64); // Verde
-    if (value <= 35) return new THREE.Color(0xffdc00); // Amarillo
-    if (value <= 55) return new THREE.Color(0xff6400); // Naranja
-    return new THREE.Color(0xff0000);                  // Rojo
-  };
+  // All sensors are merged into a single THREE.Points cloud (one draw call)
+  // instead of one Mesh per sensor, so this stays smooth as the sensor count grows.
+  useEffect(() => {
+    if (!globeEl.current || points.length === 0) return;
 
-  const getDynamicScale = (value) => {
-    return value > 35 ? 10.0 : 5.0; 
-  };
+    const scene = globeEl.current.scene();
+    const pointsObj = createPointsObject(
+      points,
+      (lat, lng) => globeEl.current.getCoords(lat, lng, POINTS_ALTITUDE),
+      glowTexture
+    );
+    scene.add(pointsObj);
+    pointsObjRef.current = pointsObj;
+
+    return () => {
+      scene.remove(pointsObj);
+      disposePointsObject(pointsObj);
+    };
+  }, [points, glowTexture]);
+
+  // Drives the subtle size-pulse uniform in the points shader.
+  useEffect(() => {
+    const clock = new THREE.Clock();
+    let frameId;
+    const animate = () => {
+      frameId = requestAnimationFrame(animate);
+      const obj = pointsObjRef.current;
+      if (obj) {
+        obj.material.uniforms.uTime.value = clock.getElapsedTime();
+      }
+    };
+    animate();
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   return (
     <div style={{ backgroundColor: '#000', height: '100vh', position: 'relative' }}>
@@ -70,32 +98,6 @@ function App() {
         ref={globeEl}
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
         backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-        
-        // nodes
-        customLayerData={points}
-        customThreeObject={d => {
-          const geometry = new THREE.PlaneGeometry(1, 1);
-          const material = new THREE.MeshBasicMaterial({
-            map: glowTexture,
-            color: getPointColor(d.value),
-            transparent: true,
-            opacity: 0.6,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-            side: THREE.DoubleSide
-          });
-          const mesh = new THREE.Mesh(geometry, material);
-          const scale = getDynamicScale(d.value);
-          mesh.scale.set(scale, scale, scale);
-          return mesh;
-        }}
-        customThreeObjectUpdate={(obj, d) => {
-          if (globeEl.current) {
-            Object.assign(obj.position, globeEl.current.getCoords(d.lat, d.lng, 0.008));
-          }
-          obj.lookAt(new THREE.Vector3(0, 0, 0));
-        }}
-
         enablePointerInteraction={true}
         atmosphereColor="#3a228a"
         atmosphereAltitude={0.15}
