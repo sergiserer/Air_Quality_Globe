@@ -1,8 +1,13 @@
 # Air Quality Globe – 3D Visualization Experiment
+[<img src="https://img.shields.io/badge/Lenguaje-JavaScript-yellow">](https://www.javascript.com/)
+[<img src="https://img.shields.io/badge/3D-Three.js-red">](https://threejs.org/)
+
 
 A small side project to explore 3D data visualization in the browser using real-time air quality data (PM2.5).
 
 ![Project Preview](assets/output.gif)
+
+
 
 
 ## Live Demo
@@ -43,7 +48,6 @@ Node.js, Express.js, Axios
 It is not intended to be a scientifically accurate air quality analysis tool.
 - Data is visualized at a basic, per-measurement level
 - No spatial interpolation or historical trend analysis
-- No advanced performance optimizations
 - No automated testing
 
 The focus is on visualization and integration, not on analytical depth.
